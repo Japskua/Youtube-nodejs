@@ -2,29 +2,35 @@
  * Created by Janne on 2.7.2014.
  */
 
-
+"use strict";
 
 var express = require('express');
 var router = express.Router();
 var googleapis = require('googleapis');
-var youtubecommands = require('./youtube/youtube-commands.js');
+var Youtubecommands = require('./youtube/youtube-commands.js');
+var MetadataParser = require('./youtube/metadata-parser.js');
 
 /**
  * GET playlists.
  */
-router.get('/playlists', function(req, res) {
+router.get('/playlists', function (req, res) {
 
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+    var youtubeCommands, oauth2Client;
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth();
 
     // Try getting g+ info
     googleapis
         .discover('youtube', 'v3')
-        .execute(function(err, client) {
+        .execute(function (err, client) {
 
+            if (err) {
+                res.send("Received an error", err);
+                return;
+            }
 
-            youtubeCommands.getPlaylists(client, oauth2Client, function(err, result) {
-                if(err) {
+            youtubeCommands.getPlaylists(client, oauth2Client, function (err, result) {
+                if (err) {
                     youtubeCommands.CheckForErrorType(err, res);
                     return;
                 }
@@ -38,18 +44,23 @@ router.get('/playlists', function(req, res) {
 
 
 /* GET Playlist Items. */
-router.get('/playlistItems', function(req, res) {
+router.get('/playlistItems', function (req, res) {
 
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+    var youtubeCommands, oauth2Client;
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth();
 
     // Try getting g+ info
     googleapis
         .discover('youtube', 'v3')
-        .execute(function(err, client) {
+        .execute(function (err, client) {
+            if (err) {
+                res.send("Received an error", err);
+                return;
+            }
 
-            youtubeCommands.getPlaylistItems(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function(err, result) {
-                if(err) {
+            youtubeCommands.getPlaylistItems(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", function (err, result) {
+                if (err) {
                     youtubeCommands.CheckForErrorType(err, res);
                     return;
                 }
@@ -62,18 +73,22 @@ router.get('/playlistItems', function(req, res) {
 });
 
 /* GET video. */
-router.get('/videos', function(req, res) {
+router.get('/videos', function (req, res) {
 
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+    var youtubeCommands, oauth2Client;
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth();
 
     // Try getting g+ info
     googleapis
         .discover('youtube', 'v3')
-        .execute(function(err, client) {
-
-            youtubeCommands.getVideos(client, oauth2Client, "JyLL-95IjzA", function(err, result) {
-                if(err) {
+        .execute(function (err, client) {
+            if (err) {
+                res.send("Received an error", err);
+                return;
+            }
+            youtubeCommands.getVideos(client, oauth2Client, "JyLL-95IjzA", function (err, result) {
+                if (err) {
                     youtubeCommands.CheckForErrorType(err, res);
                     return;
                 }
@@ -85,24 +100,50 @@ router.get('/videos', function(req, res) {
 
 });
 
-/* GET Upload page for videos */
-router.get('/upload', function(req, res) {
+router.get('/metadatatest', function (req, res) {
 
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+
+    var metadataParser, source;
+    // Initialize the Metadata parser
+    metadataParser = new MetadataParser();
+    // Set the source
+    source = "/youtube/nauhoite.mp4";
+
+    // Parse the video informatio for the creation time
+    metadataParser.ParseVideoCreationTime(source, function (err, result) {
+        if (err) {
+            res.send(err);
+            return;
+        }
+
+        res.send(result);
+    });
+
+});
+
+/* GET Upload page for videos */
+router.get('/upload', function (req, res) {
+
+    var youtubeCommands, oauth2Client;
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth();
 
     googleapis
         .discover('youtube', 'v3')
-        .execute(function(err, client) {
+        .execute(function (err, client) {
 
+            if (err) {
+                res.send("Received an error", err);
+                return;
+            }
             // Create the metadata
             var metadata = youtubeCommands.createMetadata("TestUpload",
                                           "Testing how well the upload works",
                                           "unlisted",
-                                          ["test","upload"]);
+                                          ["test", "upload"]);
 
             // And then upload the video
-            youtubeCommands.uploadVideo(client, oauth2Client, metadata, "nauhoite.mp4", function(err, result) {
+            youtubeCommands.uploadVideo(client, oauth2Client, metadata, "nauhoite.mp4", function (err, result) {
                 if (err) {
                     youtubeCommands.CheckForErrorType(err, res);
                     return;
@@ -113,7 +154,7 @@ router.get('/upload', function(req, res) {
 
                 console.log(result);
 
-                youtubeCommands.insertToPlaylist(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", videoId, function(err, insertResult) {
+                youtubeCommands.insertToPlaylist(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", videoId, function (err, insertResult) {
                     if (err) {
                         youtubeCommands.CheckForErrorType(err, res);
                         return;
@@ -131,21 +172,22 @@ router.get('/upload', function(req, res) {
 
 
 /* GET Upload page for videos */
-router.get('/changePlaylist/:id', function(req, res) {
+router.get('/changePlaylist/:id', function (req, res) {
 
     console.log(req.params);
 
-    var videoId = req.params.id;
-
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+    var youtubeCommands, oauth2Client, videoId;
+    // Get the videoId
+    videoId = req.params.id;
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth();
 
     googleapis
         .discover('youtube', 'v3')
-        .execute(function(err, client) {
+        .execute(function (err, client) {
 
 
-            youtubeCommands.insertToPlaylist(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", videoId, function(err, insertResult) {
+            youtubeCommands.insertToPlaylist(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", videoId, function (err, insertResult) {
                 if (err) {
                     youtubeCommands.CheckForErrorType(err, res);
                     return;

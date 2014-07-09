@@ -1,19 +1,21 @@
 /**
  * Created by Janne on 3.7.2014.
  */
+"use strict";
 
 var fs = require('fs');
 var googleapis = require('googleapis'),
     OAuth2 = googleapis.auth.OAuth2;
 
-var config = require('./../../config.js');
+var Config = require('./../../config.js');
 
 /**
  * The constructor for creating the YoutubeCommands class
  * @constructor
  */
 function YoutubeCommands() {
-
+    // Just the constructor
+    this.name = "YoutubeCommands";
 }
 
 /**
@@ -22,8 +24,8 @@ function YoutubeCommands() {
  * @param res
  * @constructor
  */
-YoutubeCommands.prototype.CheckForErrorType = function(err, res) {
-    if(err.errors.reason === "authError") {
+YoutubeCommands.prototype.CheckForErrorType = function (err, res) {
+    if (err.errors.reason === "authError") {
         res.redirect("http://localhost:3000/login");
     }
 
@@ -39,7 +41,7 @@ YoutubeCommands.prototype.CheckForErrorType = function(err, res) {
  * @param {Array} tags An array of tags that should be inserted
  * @returns {{snippet: {title: *, description: *, tags: *}, status: {privacyStatus: *}}}
  */
-YoutubeCommands.prototype.createMetadata = function(title, description, privacyStatus, tags) {
+YoutubeCommands.prototype.createMetadata = function (title, description, privacyStatus, tags) {
 
     return {
         snippet : { title : title, description : description, tags : tags},
@@ -56,10 +58,10 @@ YoutubeCommands.prototype.createMetadata = function(title, description, privacyS
  * @param {String} video the path to the video
  * @param {Function} callback The callback
  */
-YoutubeCommands.prototype.uploadVideo = function(client, authClient, metadata, video, callback) {
+YoutubeCommands.prototype.uploadVideo = function (client, authClient, metadata, video, callback) {
 
     client
-        .youtube.videos.insert( { part : 'snippet, status, player'}, metadata)
+        .youtube.videos.insert({ part : 'snippet, status, player'}, metadata)
         .withMedia('video/mp4', fs.readFileSync(video))
         .withAuthClient(authClient)
         .execute(callback);
@@ -73,10 +75,10 @@ YoutubeCommands.prototype.uploadVideo = function(client, authClient, metadata, v
  * @param {String} videoId The ID of the video in question
  * @param {Function} callback The callback function
  */
-YoutubeCommands.prototype.getVideos = function(client, authClient, videoId, callback) {
+YoutubeCommands.prototype.getVideos = function (client, authClient, videoId, callback) {
 
     client
-        .youtube.videos.list( { part : "id, snippet, status, player",
+        .youtube.videos.list({ part : "id, snippet, status, player",
             id : videoId})
         .withAuthClient(authClient)
         .execute(callback);
@@ -86,11 +88,12 @@ YoutubeCommands.prototype.getVideos = function(client, authClient, videoId, call
  * Initializes the OAuth2 information
  * @returns {OAuth2}
  */
-YoutubeCommands.prototype.initiliazeOauth = function() {
+YoutubeCommands.prototype.initiliazeOauth = function () {
 
-    var cfg = new config();
+    var cfg, oauth2Client;
+    cfg = new Config();
 
-    var oauth2Client =
+    oauth2Client =
         new OAuth2(cfg.CLIENT_ID, cfg.CLIENT_SECRET, cfg.REDIRECT_URL);
 
     oauth2Client.setCredentials(cfg.TOKENS);
@@ -105,10 +108,10 @@ YoutubeCommands.prototype.initiliazeOauth = function() {
  * @param {String} playlistId The ID of the playlist
  * @param {Function} callback the callback function
  */
-YoutubeCommands.prototype.getPlaylistItems = function(client, authClient, playlistId, callback) {
+YoutubeCommands.prototype.getPlaylistItems = function (client, authClient, playlistId, callback) {
 
     client
-        .youtube.playlistItems.list( { part : "id, snippet, status, contentDetails",
+        .youtube.playlistItems.list({ part : "id, snippet, status, contentDetails",
             playlistId : playlistId})
         .withAuthClient(authClient)
         .execute(callback);
@@ -123,17 +126,17 @@ YoutubeCommands.prototype.getPlaylistItems = function(client, authClient, playli
  * @param {String} videoId The ID of the video to add
  * @param {Function} callback Callback function
  */
-YoutubeCommands.prototype.insertToPlaylist = function(client, authClient, playlistId, videoId, callback) {
+YoutubeCommands.prototype.insertToPlaylist = function (client, authClient, playlistId, videoId, callback) {
 
     // Create the snippet to insert
     var snippet = { playlistId: playlistId,
         resourceId: {
             videoId: videoId,
-            kind: "youtube#video"}
-    };
+            kind: "youtube#video"
+        }};
 
     client
-        .youtube.playlistItems.insert( { part : "snippet, status"}, { snippet : snippet })
+        .youtube.playlistItems.insert({ part : "snippet, status"}, { snippet : snippet })
         .withAuthClient(authClient)
         .execute(callback);
 };
@@ -144,10 +147,10 @@ YoutubeCommands.prototype.insertToPlaylist = function(client, authClient, playli
  * @param authClient The authorization information
  * @param {Function} callback The function callback
  */
-YoutubeCommands.prototype.getPlaylists = function(client, authClient, callback) {
+YoutubeCommands.prototype.getPlaylists = function (client, authClient, callback) {
 
     client
-        .youtube.playlists.list( { part : "id,snippet,status,contentDetails",
+        .youtube.playlists.list({ part : "id,snippet,status,contentDetails",
             mine : true })
         .withAuthClient(authClient)
         .execute(callback);
