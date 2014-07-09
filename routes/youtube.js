@@ -8,7 +8,7 @@ var express = require('express');
 var router = express.Router();
 var googleapis = require('googleapis');
 var Youtubecommands = require('./youtube/youtube-commands.js');
-var MetadataParser = require('./youtube/metadata-parser.js');
+var MetadataParser = require('./metadata/metadata-parser.js');
 
 /**
  * GET playlists.
@@ -109,14 +109,15 @@ router.get('/metadatatest', function (req, res) {
     // Set the source
     source = "/youtube/nauhoite.mp4";
 
-    // Parse the video informatio for the creation time
-    metadataParser.ParseVideoCreationTime(source, function (err, result) {
+    // Parse the video information for the creation time
+    metadataParser.ParseMetadata(source, function (err, metadataObject) {
         if (err) {
             res.send(err);
             return;
         }
 
-        res.send(result);
+        // Display the creation time at the web site
+        res.send(metadataObject.getCreationTime());
     });
 
 });

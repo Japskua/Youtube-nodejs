@@ -6,14 +6,20 @@
 
 var ffmpeg = require('fluent-ffmpeg');
 var Config = require('./../../config.js');
+var Metadata = require('./metadata.js');
 
 /**
  * Constructor for the Metadata Parser of Videos
  * @constructor
  */
 function MetadataParser() {
-    ffmpeg.setFfmpegPath(config.ffmpegPath);
-    ffmpeg.setFfprobePath(config.ffprobePath);
+
+    var cfg = new Config();
+
+    ffmpeg.setFfmpegPath(cfg.ffmpegPath);
+    ffmpeg.setFfprobePath(cfg.ffprobePath);
+
+    this.metadata = "";
 }
 
 /**
@@ -23,18 +29,11 @@ function MetadataParser() {
  * @return {String} Returns a string containing the creation time of the video
  * @constructor
  */
-MetadataParser.prototype.ParseVideoCreationTime = function (source, callback) {
+MetadataParser.prototype.ParseMetadata = function (source, callback) {
 
     console.log("Starting to analyze the metadata");
 
     source = "/nauhoite.mp4";
-
-    var cfg = new Config();
-
-    ffmpeg.setFfmpegPath(cfg.ffmpegPath);
-    ffmpeg.setFfprobePath(cfg.ffprobePath);
-
-    console.log(cfg.ffprobePath);
 
     // Probe for the metadata information of the video
     ffmpeg.ffprobe(source, function (err, metadata) {
@@ -46,11 +45,14 @@ MetadataParser.prototype.ParseVideoCreationTime = function (source, callback) {
             return;
         }
 
-        console.log("Metadata analyzed, result is:", metadata);
-        // Return the creation time
-        callback(null, metadata.streams[0].tags.creation_time);
+        // Got the results, so save them in the metadata file
+        var metadataObject = new Metadata(metadata);
+
+        // Return the metadata object
+        callback(null, metadataObject);
     });
 
 };
+
 
 module.exports = MetadataParser;
