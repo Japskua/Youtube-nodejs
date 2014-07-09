@@ -88,7 +88,7 @@ YoutubeCommands.prototype.getVideos = function (client, authClient, videoId, cal
  * Initializes the OAuth2 information
  * @returns {OAuth2}
  */
-YoutubeCommands.prototype.initiliazeOauth = function () {
+YoutubeCommands.prototype.initiliazeOauth = function (req, res) {
 
     var cfg, oauth2Client;
     cfg = new Config();
@@ -96,7 +96,13 @@ YoutubeCommands.prototype.initiliazeOauth = function () {
     oauth2Client =
         new OAuth2(cfg.CLIENT_ID, cfg.CLIENT_SECRET, cfg.REDIRECT_URL);
 
-    oauth2Client.setCredentials(cfg.TOKENS);
+    console.log(req.signedCookies.tokens);
+
+    // If the credentials are set
+    if ((req.signedCookies.tokens !== undefined) || (req.signedCookies.tokens !== null)) {
+        // Set the cookie
+        oauth2Client.setCredentials(req.signedCookies.tokens);
+    }
 
     return oauth2Client;
 };

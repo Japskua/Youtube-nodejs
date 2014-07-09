@@ -17,7 +17,7 @@ router.get('/playlists', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
-    oauth2Client = youtubeCommands.initiliazeOauth();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
     googleapis
@@ -48,7 +48,7 @@ router.get('/playlistItems', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
-    oauth2Client = youtubeCommands.initiliazeOauth();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
     googleapis
@@ -77,7 +77,7 @@ router.get('/videos', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
-    oauth2Client = youtubeCommands.initiliazeOauth();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
     googleapis
@@ -101,7 +101,6 @@ router.get('/videos', function (req, res) {
 });
 
 router.get('/metadatatest', function (req, res) {
-
 
     var metadataParser, source;
     // Initialize the Metadata parser
@@ -127,7 +126,7 @@ router.get('/upload', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
-    oauth2Client = youtubeCommands.initiliazeOauth();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     googleapis
         .discover('youtube', 'v3')
@@ -181,7 +180,7 @@ router.get('/changePlaylist/:id', function (req, res) {
     // Get the videoId
     videoId = req.params.id;
     youtubeCommands = new Youtubecommands();
-    oauth2Client = youtubeCommands.initiliazeOauth();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     googleapis
         .discover('youtube', 'v3')

@@ -21,7 +21,7 @@ app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
+app.use(cookieParser("My0WnS3cre3TK3Y"));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);

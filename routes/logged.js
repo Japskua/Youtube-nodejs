@@ -7,28 +7,32 @@ var express = require('express');
 var router = express.Router();
 var googleapis = require('googleapis'),
     OAuth2 = googleapis.auth.OAuth2;
-var youtubecommands = require('./youtube/youtube-commands.js');
+var Youtubecommands = require('./youtube/youtube-commands.js');
 
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
 
     // Get the parameters
     console.log('Request query parameters are:', req.query);
 
     // Get the code from the callback
-    var code = req.query.code;
+    var code, youtubeCommands, oauth2Client;
 
-    var youtubeCommands = new youtubecommands();
-    var oauth2Client = youtubeCommands.initiliazeOauth();
+    code = req.query.code;
 
-    oauth2Client.getToken(code, function(err, tokens) {
+    console.log("The cookie tokens are:", req.signedCookies.tokens);
+
+    youtubeCommands = new Youtubecommands();
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
+
+    oauth2Client.getToken(code, function (err, tokens) {
         // contains an access_token and optionally a refresh_token.
         // save them permanently.
 
-        var accessToken = tokens.access_token;
-        var refreshToken = tokens.refresh_token;
+        // Save the tokens as cookie, signed
+        res.cookie('tokens', tokens, {signed: true});
 
-        res.send("Logged in and the tokens are:\nAccess Token:" + accessToken + "\nRefresh Token:" + refreshToken);
+        res.send("Logged in!");
     });
 
 
