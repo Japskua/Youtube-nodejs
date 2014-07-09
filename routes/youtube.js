@@ -9,6 +9,8 @@ var router = express.Router();
 var googleapis = require('googleapis');
 var Youtubecommands = require('./youtube/youtube-commands.js');
 var MetadataParser = require('./metadata/metadata-parser.js');
+var fs = require('fs');
+var busboy = require('connect-busboy');
 
 /**
  * GET playlists.
@@ -166,6 +168,38 @@ router.get('/upload', function (req, res) {
             });
 
         });
+
+
+});
+
+/* POST Upload page */
+router.post('/upload', function (req, res) {
+
+    // Initialize filestream
+    var fstream;
+    // Make a pipe
+    req.pipe(req.busboy);
+    // Then, use busboy to read the file
+    req.busboy.on('file', function (fieldname, file, filename) {
+
+        console.log("Uploading: " + filename);
+
+        // Create a writestream for the data
+        fstream = fs.createWriteStream(__dirname + '/files' + filename);
+
+        // Then, pipe the data to the filestream
+        file.pipe(fstream);
+
+        // And then finally close the pipestream
+        fstream.on('close', function (err) {
+            if (err) {
+                res.send(err);
+                return;
+            }
+            res.send("Upload done!");
+        });
+
+    });
 
 
 });

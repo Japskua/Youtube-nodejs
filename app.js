@@ -10,6 +10,7 @@ var users = require('./routes/users');
 var youtube = require('./routes/youtube');
 var login = require('./routes/login');
 var loggedin = require('./routes/logged');
+var busboy = require('connect-busboy');
 
 var app = express();
 
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser("My0WnS3cre3TK3Y"));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(busboy());
 
 app.use('/', routes);
 app.use('/users', users);
