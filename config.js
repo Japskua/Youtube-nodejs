@@ -2,20 +2,17 @@
  * Created by Janne on 3.7.2014.
  */
 
+"use strict";
+
 /**
  * The configuration function constructor
  * @constructor
  */
 function Config() {
 
-    this.CLIENT_ID = 'CLIENT_ID';
-    this.CLIENT_SECRET = 'CLIENT_SECRET';
+    this.CLIENT_ID = '630220068318-hmvth59daua2p3je12hn7j2i2h8tgo9k.apps.googleusercontent.com';
+    this.CLIENT_SECRET = 'BSvpx4ZBOJQ5gIBk0eyl_aBw';
     this.REDIRECT_URL = 'https://www.example.com/oauth2callback';
-
-    this.TOKENS = {
-        access_token : "ACCESS_TOKEN",
-        refresh_token : undefined
-    };
 
     // Set the Ffmpeg path here
     this.ffmpegPath = "C:\\ffmpeg\\bin\\ffmpeg.exe";

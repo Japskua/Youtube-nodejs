@@ -1,6 +1,7 @@
 /**
  * Created by Janne on 2.7.2014.
  */
+"use strict";
 
 
 var express = require('express');
@@ -20,7 +21,7 @@ router.get('/', function (req, res) {
 
     code = req.query.code;
 
-    console.log("The cookie tokens are:", req.signedCookies.tokens);
+    console.log("logged.js>> The cookie tokens are:", req.signedCookies.tokens);
 
     youtubeCommands = new Youtubecommands();
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);

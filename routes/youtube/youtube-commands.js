@@ -85,6 +85,28 @@ YoutubeCommands.prototype.getVideos = function (client, authClient, videoId, cal
 };
 
 /**
+ * Checks for signup tokens from the client. If not found, will redirect to login page
+ * @param req Request data
+ * @param res Response data
+ */
+YoutubeCommands.prototype.checkForTokens = function (req, res) {
+
+    console.log("Checking for the tokens");
+
+    // Check if the tokens are undefined
+    if (req.signedCookies.tokens === undefined) {
+        console.log("The tokens are undefined");
+        // In which case, redirect to login page
+        return false;
+    }
+
+    // Otherwise, the tokens are not undefined
+    console.log("The tokens are defined:", req.signedCookies.tokens);
+    return true;
+
+};
+
+/**
  * Initializes the OAuth2 information
  * @returns {OAuth2}
  */
@@ -96,7 +118,7 @@ YoutubeCommands.prototype.initiliazeOauth = function (req, res) {
     oauth2Client =
         new OAuth2(cfg.CLIENT_ID, cfg.CLIENT_SECRET, cfg.REDIRECT_URL);
 
-    console.log(req.signedCookies.tokens);
+    console.log("initializeOauth() >> signed cookie tokes are:", req.signedCookies.tokens);
 
     // If the credentials are set
     if ((req.signedCookies.tokens !== undefined) || (req.signedCookies.tokens !== null)) {

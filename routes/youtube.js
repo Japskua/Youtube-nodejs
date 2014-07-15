@@ -19,6 +19,11 @@ router.get('/playlists', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
+
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
@@ -50,6 +55,10 @@ router.get('/playlistItems', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
@@ -79,6 +88,10 @@ router.get('/videos', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     // Try getting g+ info
@@ -128,6 +141,10 @@ router.get('/upload', function (req, res) {
 
     var youtubeCommands, oauth2Client;
     youtubeCommands = new Youtubecommands();
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     googleapis
@@ -214,6 +231,10 @@ router.get('/changePlaylist/:id', function (req, res) {
     // Get the videoId
     videoId = req.params.id;
     youtubeCommands = new Youtubecommands();
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
     oauth2Client = youtubeCommands.initiliazeOauth(req, res);
 
     googleapis
