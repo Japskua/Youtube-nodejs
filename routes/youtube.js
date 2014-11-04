@@ -201,8 +201,10 @@ router.post('/upload', function (req, res) {
 
         console.log("Uploading: " + filename);
 
+        var path = __dirname + '/tempfiles/' + filename;
+
         // Create a writestream for the data
-        fstream = fs.createWriteStream(__dirname + '/files' + filename);
+        fstream = fs.createWriteStream(path);
 
         // Then, pipe the data to the filestream
         file.pipe(fstream);
@@ -213,13 +215,65 @@ router.post('/upload', function (req, res) {
                 res.send(err);
                 return;
             }
-            res.send("Upload done!");
+            //res.send("Upload done!");
+            UploadToYoutube(req, res, path);
         });
 
     });
 
 
 });
+
+function UploadToYoutube(req, res, filepath) {
+
+    var youtubeCommands, oauth2Client;
+    youtubeCommands = new Youtubecommands();
+    if (youtubeCommands.checkForTokens(req, res) === false) {
+        res.redirect('/login');
+        return;
+    }
+    oauth2Client = youtubeCommands.initiliazeOauth(req, res);
+
+    googleapis
+        .discover('youtube', 'v3')
+        .execute(function (err, client) {
+
+            if (err) {
+                res.send("Received an error", err);
+                return;
+            }
+            // Create the metadata
+            var metadata = youtubeCommands.createMetadata("TestUpload",
+                "Testing how well the upload works",
+                "unlisted",
+                ["test", "upload"]);
+
+            // And then upload the video
+            youtubeCommands.uploadVideo(client, oauth2Client, metadata, filepath, function (err, result) {
+                if (err) {
+                    youtubeCommands.CheckForErrorType(err, res);
+                    return;
+                }
+
+                // Get the videoId
+                var videoId = result.id;
+
+                console.log(result);
+
+                youtubeCommands.insertToPlaylist(client, oauth2Client, "PLX0jcZ2eQoOa6AISCWiwNAWSlNVVSup5W", videoId, function (err, insertResult) {
+                    if (err) {
+                        youtubeCommands.CheckForErrorType(err, res);
+                        return;
+                    }
+                    // Otherwise, things okay. Send the result
+                    res.send(insertResult);
+                });
+
+            });
+
+        });
+
+}
 
 
 /* GET Upload page for videos */
